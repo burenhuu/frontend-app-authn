@@ -23,7 +23,7 @@ registerIcons();
 
 const MainApp = () => (
   <AppProvider store={configureStore()}>
-    <IntlProvider locale='mn' messages={messages.mn}>
+    <IntlProvider defaultLocale='mn' locale='mn' messages={messages.mn}>
       <Helmet>
         <link rel="shortcut icon" href={getConfig().FAVICON_URL} type="image/x-icon" />
       </Helmet>
