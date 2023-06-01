@@ -4,14 +4,13 @@ import { getConfig } from '@edx/frontend-platform';
 import { injectIntl, intlShape } from '@edx/frontend-platform/i18n';
 import { Hyperlink, Image } from '@edx/paragon';
 import classNames from 'classnames';
-
+import loginBanner from './login-banner.png'
 import messages from './messages';
-const imgUrl = getConfig().LOGO_URL.slice(0, -8);
 
 const LargeLayout = ({ intl }) => (
   
   <div className="w-50 d-flex">
-    <img src={imgUrl + 'login-banner.png'} alt='banner' className="login-banner"/>
+    <img src={loginBanner} alt='banner' className="login-banner"/>
     {/* <div className="col-md-12">
       
       <Hyperlink destination={getConfig().MARKETING_SITE_BASE_URL}>
