@@ -38,7 +38,7 @@ describe('ScreenLayout', () => {
 
   it('should display the form, pass as a child in LargeScreenLayout', () => {
     const largeScreen = mount(
-      <IntlProvider locale="en">
+      <IntlProvider locale="mn">
         <div>
           <LargeLayout />
           <form>

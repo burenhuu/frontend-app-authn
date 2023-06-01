@@ -1,23 +1,19 @@
 import React from 'react';
 
 import { getConfig } from '@edx/frontend-platform';
-import { useIntl } from '@edx/frontend-platform/i18n';
+import { injectIntl, intlShape } from '@edx/frontend-platform/i18n';
 import {
   Button, Form,
-  Icon,
 } from '@edx/paragon';
-import { Login } from '@edx/paragon/icons';
+import { faSignInAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PropTypes from 'prop-types';
 
-import messages from './messages';
 import { LOGIN_PAGE, SUPPORTED_ICON_CLASSES } from '../data/constants';
+import messages from './messages';
 
-/**
- * This component renders the Single sign-on (SSO) button only for the tpa provider passed
- * */
 const EnterpriseSSO = (props) => {
-  const { formatMessage } = useIntl();
+  const { intl } = props;
   const tpaProvider = props.provider;
   const disablePublicAccountCreation = getConfig().ALLOW_PUBLIC_ACCOUNT_CREATION === false;
 
@@ -37,7 +33,7 @@ const EnterpriseSSO = (props) => {
         <div className="d-flex flex-column">
           <div className="mw-450">
             <Form className="m-0">
-              <p>{formatMessage(messages['enterprisetpa.title.heading'], { providerName: tpaProvider.name })}</p>
+              <p>{intl.formatMessage(messages['enterprisetpa.title.heading'], { providerName: tpaProvider.name })}</p>
               <Button
                 id={tpaProvider.id}
                 key={tpaProvider.id}
@@ -48,18 +44,16 @@ const EnterpriseSSO = (props) => {
               >
                 {tpaProvider.iconImage ? (
                   <div aria-hidden="true">
-                    <img className="btn-tpa__image-icon" src={tpaProvider.iconImage} alt={`icon ${tpaProvider.name}`} />
+                    <img className="icon-image" src={tpaProvider.iconImage} alt={`icon ${tpaProvider.name}`} />
                     <span className="pl-2" aria-hidden="true">{ tpaProvider.name }</span>
                   </div>
                 )
                   : (
                     <>
-                      <div className="btn-tpa__font-container" aria-hidden="true">
-                        {SUPPORTED_ICON_CLASSES.includes(tpaProvider.iconClass) ? (
-                          <FontAwesomeIcon icon={['fab', tpaProvider.iconClass]} />)
-                          : (
-                            <Icon className="h-75" src={Login} />
-                          )}
+                      <div className="font-container" aria-hidden="true">
+                        <FontAwesomeIcon
+                          icon={SUPPORTED_ICON_CLASSES.includes(tpaProvider.iconClass) ? ['fab', tpaProvider.iconClass] : faSignInAlt}
+                        />
                       </div>
                       <span className="pl-2" aria-hidden="true">{ tpaProvider.name }</span>
                     </>
@@ -75,8 +69,8 @@ const EnterpriseSSO = (props) => {
                 onClick={(e) => handleClick(e)}
               >
                 {disablePublicAccountCreation
-                  ? formatMessage(messages['enterprisetpa.login.button.text.public.account.creation.disabled'])
-                  : formatMessage(messages['enterprisetpa.login.button.text'])}
+                  ? intl.formatMessage(messages['enterprisetpa.login.button.text.public.account.creation.disabled'])
+                  : intl.formatMessage(messages['enterprisetpa.login.button.text'])}
               </Button>
             </Form>
           </div>
@@ -107,6 +101,7 @@ EnterpriseSSO.propTypes = {
     loginUrl: PropTypes.string,
     registerUrl: PropTypes.string,
   }),
+  intl: intlShape.isRequired,
 };
 
-export default EnterpriseSSO;
+export default injectIntl(EnterpriseSSO);

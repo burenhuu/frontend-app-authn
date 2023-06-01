@@ -1,6 +1,6 @@
-import { LOGIN_PERSIST_FORM_DATA, LOGIN_REMOVE_PASSWORD_RESET_BANNER, LOGIN_REQUEST } from './actions';
 import { DEFAULT_STATE, PENDING_STATE } from '../../data/constants';
 import { RESET_PASSWORD } from '../../reset-password';
+import { LOGIN_PERSIST_FORM_DATA, LOGIN_REMOVE_PASSWORD_RESET_BANNER, LOGIN_REQUEST } from './actions';
 
 export const defaultState = {
   loginError: null,
@@ -16,7 +16,7 @@ export const defaultState = {
   },
 };
 
-const reducer = (state = defaultState, action = {}) => {
+const reducer = (state = defaultState, action) => {
   switch (action.type) {
     case LOGIN_REQUEST.BEGIN:
       return {

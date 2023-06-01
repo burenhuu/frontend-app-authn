@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 import { getConfig } from '@edx/frontend-platform';
 import { sendPageEvent, sendTrackEvent } from '@edx/frontend-platform/analytics';
-import { useIntl } from '@edx/frontend-platform/i18n';
+import { injectIntl, intlShape } from '@edx/frontend-platform/i18n';
 import {
   Form,
   Hyperlink,
@@ -17,23 +17,22 @@ import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet';
 import { Redirect } from 'react-router-dom';
 
+import BaseComponent from '../base-component';
+import { FormGroup } from '../common-components';
+import { DEFAULT_STATE, LOGIN_PAGE, VALID_EMAIL_REGEX } from '../data/constants';
+import { updatePathWithQueryParams, windowScrollTo } from '../data/utils';
 import { forgotPassword, setForgotPasswordFormData } from './data/actions';
 import { forgotPasswordResultSelector } from './data/selectors';
 import ForgotPasswordAlert from './ForgotPasswordAlert';
 import messages from './messages';
-import { BaseComponent } from '../base-component';
-import { FormGroup } from '../common-components';
-import { DEFAULT_STATE, LOGIN_PAGE, VALID_EMAIL_REGEX } from '../data/constants';
-import { updatePathWithQueryParams, windowScrollTo } from '../data/utils';
 
 const ForgotPasswordPage = (props) => {
   const platformName = getConfig().SITE_NAME;
   const emailRegex = new RegExp(VALID_EMAIL_REGEX, 'i');
   const {
-    status, submitState, emailValidationError,
+    intl, status, submitState, emailValidationError,
   } = props;
 
-  const { formatMessage } = useIntl();
   const [email, setEmail] = useState(props.email);
   const [bannerEmail, setBannerEmail] = useState('');
   const [formErrors, setFormErrors] = useState('');
@@ -59,9 +58,9 @@ const ForgotPasswordPage = (props) => {
     let error = '';
 
     if (value === '') {
-      error = formatMessage(messages['forgot.password.empty.email.field.error']);
+      error = intl.formatMessage(messages['forgot.password.empty.email.field.error']);
     } else if (!emailRegex.test(value)) {
-      error = formatMessage(messages['forgot.password.page.invalid.email.message']);
+      error = intl.formatMessage(messages['forgot.password.page.invalid.email.message']);
     }
 
     return error;
@@ -90,14 +89,14 @@ const ForgotPasswordPage = (props) => {
   const tabTitle = (
     <div className="d-inline-flex flex-wrap align-items-center">
       <Icon src={ChevronLeft} />
-      <span className="ml-2">{formatMessage(messages['sign.in.text'])}</span>
+      <span className="ml-2">{intl.formatMessage(messages['sign.in.text'])}</span>
     </div>
   );
 
   return (
     <BaseComponent>
       <Helmet>
-        <title>{formatMessage(messages['forgot.password.page.title'],
+        <title>{intl.formatMessage(messages['forgot.password.page.title'],
           { siteName: getConfig().SITE_NAME })}
         </title>
       </Helmet>
@@ -112,13 +111,13 @@ const ForgotPasswordPage = (props) => {
           <Form id="forget-password-form" name="forget-password-form" className="mw-xs">
             <ForgotPasswordAlert email={bannerEmail} emailError={formErrors} status={status} />
             <h2 className="h4">
-              {formatMessage(messages['forgot.password.page.heading'])}
+              {intl.formatMessage(messages['forgot.password.page.heading'])}
             </h2>
             <p className="mb-4">
-              {formatMessage(messages['forgot.password.page.instructions'])}
+              {intl.formatMessage(messages['forgot.password.page.instructions'])}
             </p>
             <FormGroup
-              floatingLabel={formatMessage(messages['forgot.password.page.email.field.label'])}
+              floatingLabel={intl.formatMessage(messages['forgot.password.page.email.field.label'])}
               name="email"
               value={email}
               autoComplete="on"
@@ -126,17 +125,17 @@ const ForgotPasswordPage = (props) => {
               handleChange={(e) => setEmail(e.target.value)}
               handleBlur={handleBlur}
               handleFocus={handleFocus}
-              helpText={[formatMessage(messages['forgot.password.email.help.text'], { platformName })]}
+              helpText={[intl.formatMessage(messages['forgot.password.email.help.text'], { platformName })]}
             />
             <StatefulButton
               id="submit-forget-password"
               name="submit-forget-password"
               type="submit"
               variant="brand"
-              className="forgot-password--button"
+              className="forgot-password-button-width"
               state={submitState}
               labels={{
-                default: formatMessage(messages['forgot.password.page.submit.button']),
+                default: intl.formatMessage(messages['forgot.password.page.submit.button']),
                 pending: '',
               }}
               onClick={handleSubmit}
@@ -151,11 +150,11 @@ const ForgotPasswordPage = (props) => {
                 target="_blank"
                 showLaunchIcon={false}
               >
-                {formatMessage(messages['need.help.sign.in.text'])}
+                {intl.formatMessage(messages['need.help.sign.in.text'])}
               </Hyperlink>
             )}
             <p className="mt-5.5 small text-gray-700">
-              {formatMessage(messages['additional.help.text'], { platformName })}
+              {intl.formatMessage(messages['additional.help.text'], { platformName })}
               <span>
                 <Hyperlink isInline destination={`mailto:${getConfig().INFO_EMAIL}`}>{getConfig().INFO_EMAIL}</Hyperlink>
               </span>
@@ -171,6 +170,7 @@ ForgotPasswordPage.propTypes = {
   email: PropTypes.string,
   emailValidationError: PropTypes.string,
   forgotPassword: PropTypes.func.isRequired,
+  intl: intlShape.isRequired,
   setForgotPasswordFormData: PropTypes.func.isRequired,
   status: PropTypes.string,
   submitState: PropTypes.string,
@@ -189,4 +189,4 @@ export default connect(
     forgotPassword,
     setForgotPasswordFormData,
   },
-)(ForgotPasswordPage);
+)(injectIntl(ForgotPasswordPage));

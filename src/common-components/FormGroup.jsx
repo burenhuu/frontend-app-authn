@@ -27,7 +27,7 @@ const FormGroup = (props) => {
         readOnly={props.readOnly}
         type={props.type}
         aria-invalid={props.errorMessage !== ''}
-        className="form-group__form-field"
+        className="form-field"
         autoComplete={props.autoComplete}
         spellCheck={props.spellCheck}
         name={props.name}
@@ -37,6 +37,7 @@ const FormGroup = (props) => {
         onClick={handleClick}
         onChange={props.handleChange}
         controlClassName={props.borderClass}
+
         trailingElement={props.trailingElement}
         floatingLabel={props.floatingLabel}
       >

@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 const FormFieldRenderer = (props) => {
   let formField = null;
   const {
-    className, errorMessage, fieldData, onChangeHandler, isRequired, value,
+    errorMessage, fieldData, onChangeHandler, isRequired, value,
   } = props;
 
   const handleFocus = (e) => {
@@ -26,7 +26,6 @@ const FormFieldRenderer = (props) => {
       formField = (
         <Form.Group controlId={fieldData.name} isInvalid={!!(isRequired && errorMessage)}>
           <Form.Control
-            className={className}
             as="select"
             name={fieldData.name}
             value={value}
@@ -55,7 +54,6 @@ const FormFieldRenderer = (props) => {
       formField = (
         <Form.Group controlId={fieldData.name} isInvalid={!!(isRequired && errorMessage)}>
           <Form.Control
-            className={className}
             as="textarea"
             name={fieldData.name}
             value={value}
@@ -78,7 +76,6 @@ const FormFieldRenderer = (props) => {
       formField = (
         <Form.Group controlId={fieldData.name} isInvalid={!!(isRequired && errorMessage)}>
           <Form.Control
-            className={className}
             name={fieldData.name}
             value={value}
             aria-invalid={isRequired && Boolean(errorMessage)}
@@ -100,7 +97,6 @@ const FormFieldRenderer = (props) => {
       formField = (
         <Form.Group isInvalid={!!(isRequired && errorMessage)}>
           <Form.Checkbox
-            className={className}
             id={fieldData.name}
             checked={!!value}
             name={fieldData.name}
@@ -128,7 +124,6 @@ const FormFieldRenderer = (props) => {
   return formField;
 };
 FormFieldRenderer.defaultProps = {
-  className: '',
   value: '',
   handleBlur: null,
   handleFocus: null,
@@ -137,22 +132,17 @@ FormFieldRenderer.defaultProps = {
 };
 
 FormFieldRenderer.propTypes = {
-  className: PropTypes.string,
   fieldData: PropTypes.shape({
     type: PropTypes.string,
     label: PropTypes.string,
     name: PropTypes.string,
-    options: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.string)),
   }).isRequired,
   onChangeHandler: PropTypes.func.isRequired,
   handleBlur: PropTypes.func,
   handleFocus: PropTypes.func,
   errorMessage: PropTypes.string,
   isRequired: PropTypes.bool,
-  value: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.bool,
-  ]),
+  value: PropTypes.string,
 };
 
 export default FormFieldRenderer;

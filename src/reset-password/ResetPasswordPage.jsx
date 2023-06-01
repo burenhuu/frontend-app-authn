@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 
-import { getConfig } from '@edx/frontend-platform';
-import { useIntl } from '@edx/frontend-platform/i18n';
+import { getConfig, getQueryParameters } from '@edx/frontend-platform';
+import { injectIntl, intlShape } from '@edx/frontend-platform/i18n';
 import {
   Form,
   Icon,
@@ -16,6 +16,12 @@ import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet';
 import { Redirect } from 'react-router-dom';
 
+import BaseComponent from '../base-component';
+import { PasswordField } from '../common-components';
+import {
+  LETTER_REGEX, LOGIN_PAGE, NUMBER_REGEX, RESET_PAGE,
+} from '../data/constants';
+import { updatePathWithQueryParams, windowScrollTo } from '../data/utils';
 import { resetPassword, validateToken } from './data/actions';
 import {
   FORM_SUBMISSION_ERROR, PASSWORD_RESET_ERROR, PASSWORD_VALIDATION_ERROR, TOKEN_STATE,
@@ -24,16 +30,9 @@ import { resetPasswordResultSelector } from './data/selectors';
 import { validatePassword } from './data/service';
 import messages from './messages';
 import ResetPasswordFailure from './ResetPasswordFailure';
-import { BaseComponent } from '../base-component';
-import { PasswordField } from '../common-components';
-import {
-  LETTER_REGEX, LOGIN_PAGE, NUMBER_REGEX, RESET_PAGE,
-} from '../data/constants';
-import { getAllPossibleQueryParams, updatePathWithQueryParams, windowScrollTo } from '../data/utils';
 
 const ResetPasswordPage = (props) => {
-  const { formatMessage } = useIntl();
-  const newPasswordError = formatMessage(messages['password.validation.message']);
+  const { intl } = props;
 
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -46,9 +45,9 @@ const ResetPasswordPage = (props) => {
       setErrorCode(props.status);
     }
     if (props.status === PASSWORD_VALIDATION_ERROR) {
-      setFormErrors({ newPassword: newPasswordError });
+      setFormErrors({ newPassword: intl.formatMessage(messages['password.validation.message']) });
     }
-  }, [props.status, newPasswordError]);
+  }, [props.status, intl]);
 
   const validatePasswordFromBackend = async (password) => {
     let errorMessage = '';
@@ -68,16 +67,16 @@ const ResetPasswordPage = (props) => {
     switch (name) {
       case 'newPassword':
         if (!value || !LETTER_REGEX.test(value) || !NUMBER_REGEX.test(value) || value.length < 8) {
-          formErrors.newPassword = formatMessage(messages['password.validation.message']);
+          formErrors.newPassword = intl.formatMessage(messages['password.validation.message']);
         } else {
           validatePasswordFromBackend(value);
         }
         break;
       case 'confirmPassword':
         if (!value) {
-          formErrors.confirmPassword = formatMessage(messages['confirm.your.password']);
+          formErrors.confirmPassword = intl.formatMessage(messages['confirm.your.password']);
         } else if (value !== newPassword) {
-          formErrors.confirmPassword = formatMessage(messages['passwords.do.not.match']);
+          formErrors.confirmPassword = intl.formatMessage(messages['passwords.do.not.match']);
         } else {
           formErrors.confirmPassword = '';
         }
@@ -95,12 +94,12 @@ const ResetPasswordPage = (props) => {
     // Do not validate when focus out from 'newPassword' and focus on 'passwordValidation' icon
     // for better user experience.
     if (event.relatedTarget
-      && event.relatedTarget.name === 'password'
+      && event.relatedTarget.name === 'passwordValidation'
       && name === 'newPassword'
     ) {
       return;
     }
-    if (name === 'password') {
+    if (name === 'passwordValidation') {
       name = 'newPassword';
       value = newPassword;
     }
@@ -129,7 +128,7 @@ const ResetPasswordPage = (props) => {
         new_password1: newPassword,
         new_password2: confirmPassword,
       };
-      const params = getAllPossibleQueryParams();
+      const params = getQueryParameters();
       props.resetPassword(formPayload, props.token, params);
     } else {
       setErrorCode(FORM_SUBMISSION_ERROR);
@@ -140,7 +139,7 @@ const ResetPasswordPage = (props) => {
   const tabTitle = (
     <div className="d-inline-flex flex-wrap align-items-center">
       <Icon src={ChevronLeft} />
-      <span className="ml-2">{formatMessage(messages['sign.in'])}</span>
+      <span className="ml-2">{intl.formatMessage(messages['sign.in'])}</span>
     </div>
   );
 
@@ -148,7 +147,7 @@ const ResetPasswordPage = (props) => {
     const { token } = props.match.params;
     if (token) {
       props.validateToken(token);
-      return <Spinner animation="border" variant="primary" className="spinner--position-centered" />;
+      return <Spinner animation="border" variant="primary" className="centered-align-spinner" />;
     }
   } else if (props.status === PASSWORD_RESET_ERROR) {
     return <Redirect to={updatePathWithQueryParams(RESET_PAGE)} />;
@@ -159,8 +158,8 @@ const ResetPasswordPage = (props) => {
       <BaseComponent>
         <div>
           <Helmet>
-            <title>
-              {formatMessage(messages['reset.password.page.title'], { siteName: getConfig().SITE_NAME })}
+            <title>{intl.formatMessage(messages['reset.password.page.title'],
+              { siteName: getConfig().SITE_NAME })}
             </title>
           </Helmet>
           <Tabs activeKey="" id="controlled-tab" onSelect={(k) => setKey(k)}>
@@ -172,8 +171,8 @@ const ResetPasswordPage = (props) => {
           <div id="main-content" className="main-content">
             <div className="mw-xs">
               <ResetPasswordFailure errorCode={errorCode} errorMsg={props.errorMsg} />
-              <h4>{formatMessage(messages['reset.password'])}</h4>
-              <p className="mb-4">{formatMessage(messages['reset.password.page.instructions'])}</p>
+              <h4>{intl.formatMessage(messages['reset.password'])}</h4>
+              <p className="mb-4">{intl.formatMessage(messages['reset.password.page.instructions'])}</p>
               <Form id="set-reset-password-form" name="set-reset-password-form">
                 <PasswordField
                   name="newPassword"
@@ -182,7 +181,7 @@ const ResetPasswordPage = (props) => {
                   handleBlur={handleOnBlur}
                   handleFocus={handleOnFocus}
                   errorMessage={formErrors.newPassword}
-                  floatingLabel={formatMessage(messages['new.password.label'])}
+                  floatingLabel={intl.formatMessage(messages['new.password.label'])}
                 />
                 <PasswordField
                   name="confirmPassword"
@@ -191,17 +190,17 @@ const ResetPasswordPage = (props) => {
                   handleFocus={handleOnFocus}
                   errorMessage={formErrors.confirmPassword}
                   showRequirements={false}
-                  floatingLabel={formatMessage(messages['confirm.password.label'])}
+                  floatingLabel={intl.formatMessage(messages['confirm.password.label'])}
                 />
                 <StatefulButton
                   id="submit-new-password"
                   name="submit-new-password"
                   type="submit"
                   variant="brand"
-                  className="reset-password--button"
+                  className="stateful-button-width"
                   state={props.status}
                   labels={{
-                    default: formatMessage(messages['reset.password']),
+                    default: intl.formatMessage(messages['reset.password']),
                     pending: '',
                   }}
                   onClick={e => handleSubmit(e)}
@@ -225,6 +224,7 @@ ResetPasswordPage.defaultProps = {
 };
 
 ResetPasswordPage.propTypes = {
+  intl: intlShape.isRequired,
   resetPassword: PropTypes.func.isRequired,
   validateToken: PropTypes.func.isRequired,
   token: PropTypes.string,
@@ -243,4 +243,4 @@ export default connect(
     resetPassword,
     validateToken,
   },
-)(ResetPasswordPage);
+)(injectIntl(ResetPasswordPage));

@@ -1,6 +1,9 @@
 import React from 'react';
 
+// import CookiePolicyBanner from '@edx/frontend-component-cookie-policy-banner';
+import { getConfig } from '@edx/frontend-platform';
 import { getAuthenticatedUser } from '@edx/frontend-platform/auth';
+import { getLocale } from '@edx/frontend-platform/i18n';
 import { breakpoints } from '@edx/paragon';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
@@ -19,8 +22,12 @@ const BaseComponent = ({ children, showWelcomeBanner }) => {
 
   return (
     <>
-      <div className="col-md-12 extra-large-screen-top-stripe" />
+      {/* {getConfig().ENABLE_COOKIE_POLICY_BANNER ? <CookiePolicyBanner languageCode={getLocale()} /> : null} */}
       <div className="layout">
+        <div className={classNames('content', { 'align-items-center mt-0': authenticatedUser })}>
+          {children}
+        </div>
+
         <MediaQuery maxWidth={breakpoints.small.maxWidth - 1}>
           {authenticatedUser ? <AuthSmallLayout username={username} /> : <SmallLayout />}
         </MediaQuery>
@@ -30,10 +37,6 @@ const BaseComponent = ({ children, showWelcomeBanner }) => {
         <MediaQuery minWidth={breakpoints.extraLarge.minWidth} maxWidth={breakpoints.extraExtraLarge.maxWidth}>
           {authenticatedUser ? <AuthLargeLayout username={username} /> : <LargeLayout />}
         </MediaQuery>
-
-        <div className={classNames('content', { 'align-items-center mt-0': authenticatedUser })}>
-          {children}
-        </div>
       </div>
     </>
   );

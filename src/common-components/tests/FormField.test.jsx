@@ -39,7 +39,7 @@ describe('PasswordField', () => {
   });
 
   it('should show/hide password on icon click', () => {
-    const passwordField = mount(<IntlProvider locale="en"><IntlPasswordField {...props} /></IntlProvider>);
+    const passwordField = mount(<IntlProvider locale="mn"><IntlPasswordField {...props} /></IntlProvider>);
 
     passwordField.find('button[aria-label="Show password"]').simulate('click');
     expect(passwordField.find('input').prop('type')).toEqual('text');
@@ -49,7 +49,7 @@ describe('PasswordField', () => {
   });
 
   it('should show password requirement tooltip on focus', async () => {
-    const passwordField = mount(<IntlProvider locale="en"><IntlPasswordField {...props} /></IntlProvider>);
+    const passwordField = mount(<IntlProvider locale="mn"><IntlPasswordField {...props} /></IntlProvider>);
     jest.useFakeTimers();
     await act(async () => {
       passwordField.find('input').simulate('focus');
@@ -67,7 +67,7 @@ describe('PasswordField', () => {
     };
 
     jest.useFakeTimers();
-    const passwordField = mount(<IntlProvider locale="en"><IntlPasswordField {...props} /></IntlProvider>);
+    const passwordField = mount(<IntlProvider locale="mn"><IntlPasswordField {...props} /></IntlProvider>);
     await act(async () => {
       passwordField.find('input').simulate('focus');
       jest.runAllTimers();
@@ -80,7 +80,7 @@ describe('PasswordField', () => {
   });
 
   it('should update password requirement checks', async () => {
-    const passwordField = mount(<IntlProvider locale="en"><IntlPasswordField {...props} /></IntlProvider>);
+    const passwordField = mount(<IntlProvider locale="mn"><IntlPasswordField {...props} /></IntlProvider>);
     jest.useFakeTimers();
     await act(async () => {
       passwordField.find('input').simulate('focus');

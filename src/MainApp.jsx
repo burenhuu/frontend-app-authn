@@ -6,49 +6,43 @@ import { Helmet } from 'react-helmet';
 import { Redirect, Route, Switch } from 'react-router-dom';
 
 import {
-  NotFoundPage, registerIcons, UnAuthOnlyRoute, Zendesk,
+  Logistration, NotFoundPage, registerIcons, UnAuthOnlyRoute,
 } from './common-components';
 import configureStore from './data/configureStore';
 import {
-  AUTHN_PROGRESSIVE_PROFILING,
-  LOGIN_PAGE,
-  PAGE_NOT_FOUND,
-  PASSWORD_RESET_CONFIRM,
-  RECOMMENDATIONS,
-  REGISTER_PAGE,
-  RESET_PAGE,
+  LOGIN_PAGE, PAGE_NOT_FOUND, PASSWORD_RESET_CONFIRM, REGISTER_PAGE, RESET_PAGE, WELCOME_PAGE,
 } from './data/constants';
 import { updatePathWithQueryParams } from './data/utils';
-import { ForgotPasswordPage } from './forgot-password';
-import Logistration from './logistration/Logistration';
-import { ProgressiveProfiling } from './progressive-profiling';
-import { RecommendationsPage } from './recommendations';
-import { ResetPasswordPage } from './reset-password';
+import ForgotPasswordPage from './forgot-password';
+import ResetPasswordPage from './reset-password';
+import { ProgressiveProfiling } from './welcome';
 import './index.scss';
-
+import { IntlProvider } from '@edx/frontend-platform/i18n';
+import messages from './i18n';
 registerIcons();
 
 const MainApp = () => (
   <AppProvider store={configureStore()}>
-    <Helmet>
-      <link rel="shortcut icon" href={getConfig().FAVICON_URL} type="image/x-icon" />
-    </Helmet>
-    {getConfig().ZENDESK_KEY && <Zendesk />}
-    <Switch>
-      <Route exact path="/">
-        <Redirect to={updatePathWithQueryParams(REGISTER_PAGE)} />
-      </Route>
-      <UnAuthOnlyRoute exact path={LOGIN_PAGE} render={() => <Logistration selectedPage={LOGIN_PAGE} />} />
-      <UnAuthOnlyRoute exact path={REGISTER_PAGE} component={Logistration} />
-      <UnAuthOnlyRoute exact path={RESET_PAGE} component={ForgotPasswordPage} />
-      <Route exact path={PASSWORD_RESET_CONFIRM} component={ResetPasswordPage} />
-      <Route exact path={AUTHN_PROGRESSIVE_PROFILING} component={ProgressiveProfiling} />
-      <Route exact path={RECOMMENDATIONS} component={RecommendationsPage} />
-      <Route path={PAGE_NOT_FOUND} component={NotFoundPage} />
-      <Route path="*">
-        <Redirect to={PAGE_NOT_FOUND} />
-      </Route>
-    </Switch>
+    <IntlProvider locale='mn' messages={messages.mn}>
+      <Helmet>
+        <link rel="shortcut icon" href={getConfig().FAVICON_URL} type="image/x-icon" />
+      </Helmet>
+      <Switch>
+        <Route exact path="/">
+          <Redirect to={updatePathWithQueryParams(REGISTER_PAGE)} />
+        </Route>
+        <UnAuthOnlyRoute exact path={LOGIN_PAGE} render={() => <Logistration selectedPage={LOGIN_PAGE} />} />
+        <UnAuthOnlyRoute exact path={REGISTER_PAGE} component={Logistration} />
+        <UnAuthOnlyRoute exact path={RESET_PAGE} component={ForgotPasswordPage} />
+        <Route exact path={PASSWORD_RESET_CONFIRM} component={ResetPasswordPage} />
+        <Route exact path={WELCOME_PAGE} component={ProgressiveProfiling} />
+        <Route path={PAGE_NOT_FOUND} component={NotFoundPage} />
+        <Route path="*">
+          <Redirect to={PAGE_NOT_FOUND} />
+        </Route>
+      </Switch>
+    </IntlProvider>
+    
   </AppProvider>
 );
 

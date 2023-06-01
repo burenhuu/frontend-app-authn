@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { useIntl } from '@edx/frontend-platform/i18n';
+import { injectIntl, intlShape } from '@edx/frontend-platform/i18n';
 import {
   Form, Icon, IconButton, OverlayTrigger, Tooltip, useToggle,
 } from '@edx/paragon';
@@ -9,11 +9,11 @@ import {
 } from '@edx/paragon/icons';
 import PropTypes from 'prop-types';
 
-import messages from './messages';
 import { LETTER_REGEX, NUMBER_REGEX } from '../data/constants';
+import messages from './messages';
 
 const PasswordField = (props) => {
-  const { formatMessage } = useIntl();
+  const { formatMessage } = props.intl;
   const [isPasswordHidden, setHiddenTrue, setHiddenFalse] = useToggle(true);
   const [showTooltip, setShowTooltip] = useState(false);
 
@@ -30,11 +30,11 @@ const PasswordField = (props) => {
   };
 
   const HideButton = (
-    <IconButton onFocus={handleFocus} onBlur={handleBlur} name="password" src={VisibilityOff} iconAs={Icon} onClick={setHiddenTrue} size="sm" variant="secondary" alt={formatMessage(messages['hide.password'])} />
+    <IconButton onFocus={handleFocus} onBlur={handleBlur} name="passwordValidation" src={VisibilityOff} iconAs={Icon} onClick={setHiddenTrue} size="sm" variant="secondary" alt={formatMessage(messages['hide.password'])} />
   );
 
   const ShowButton = (
-    <IconButton onFocus={handleFocus} onBlur={handleBlur} name="password" src={Visibility} iconAs={Icon} onClick={setHiddenFalse} size="sm" variant="secondary" alt={formatMessage(messages['show.password'])} />
+    <IconButton onFocus={handleFocus} onBlur={handleBlur} name="passwordValidation" src={Visibility} iconAs={Icon} onClick={setHiddenFalse} size="sm" variant="secondary" alt={formatMessage(messages['show.password'])} />
   );
   const placement = window.innerWidth < 768 ? 'top' : 'left';
   const tooltip = (
@@ -59,7 +59,7 @@ const PasswordField = (props) => {
       <OverlayTrigger key="tooltip" placement={placement} overlay={tooltip} show={showTooltip}>
         <Form.Control
           as="input"
-          className="form-group__form-field"
+          className="form-field"
           type={isPasswordHidden ? 'password' : 'text'}
           name={props.name}
           value={props.value}
@@ -100,10 +100,11 @@ PasswordField.propTypes = {
   handleBlur: PropTypes.func,
   handleFocus: PropTypes.func,
   handleChange: PropTypes.func,
+  intl: intlShape.isRequired,
   name: PropTypes.string.isRequired,
   showRequirements: PropTypes.bool,
   value: PropTypes.string.isRequired,
   autoComplete: PropTypes.string,
 };
 
-export default PasswordField;
+export default injectIntl(PasswordField);

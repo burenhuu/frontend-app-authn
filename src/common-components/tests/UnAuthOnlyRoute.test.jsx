@@ -1,19 +1,13 @@
-/* eslint-disable import/no-import-module-exports */
-/* eslint-disable react/function-component-definition */
 import React from 'react';
 
-import { fetchAuthenticatedUser, getAuthenticatedUser } from '@edx/frontend-platform/auth';
+import * as auth from '@edx/frontend-platform/auth';
 import { mount } from 'enzyme';
+import { MemoryRouter, BrowserRouter as Router, Switch } from 'react-router-dom';
 
 import { UnAuthOnlyRoute } from '..';
 import { LOGIN_PAGE } from '../../data/constants';
 
-import { MemoryRouter, BrowserRouter as Router, Switch } from 'react-router-dom';
-
-jest.mock('@edx/frontend-platform/auth', () => ({
-  getAuthenticatedUser: jest.fn(),
-  fetchAuthenticatedUser: jest.fn(),
-}));
+jest.mock('@edx/frontend-platform/auth');
 
 const RRD = require('react-router-dom');
 // Just render plain div with its children
@@ -47,21 +41,20 @@ describe('UnAuthOnlyRoute', () => {
       username: 'gonzo',
       other: 'data',
     };
-
-    getAuthenticatedUser.mockReturnValue(user);
-    fetchAuthenticatedUser.mockReturnValueOnce(Promise.resolve(user));
+    auth.getAuthenticatedUser = jest.fn(() => user);
+    auth.fetchAuthenticatedUser = jest.fn(() => ({ then: () => auth.getAuthenticatedUser() }));
 
     mount(routerWrapper());
 
-    expect(fetchAuthenticatedUser).toBeCalledWith({ forceRefresh: true });
+    expect(auth.fetchAuthenticatedUser).toBeCalledWith({ forceRefresh: true });
   });
 
   it('should have called with forceRefresh false', () => {
-    getAuthenticatedUser.mockReturnValue(null);
-    fetchAuthenticatedUser.mockReturnValueOnce(Promise.resolve(null));
+    auth.getAuthenticatedUser = jest.fn(() => null);
+    auth.fetchAuthenticatedUser = jest.fn(() => ({ then: () => auth.getAuthenticatedUser() }));
 
     mount(routerWrapper());
 
-    expect(fetchAuthenticatedUser).toBeCalledWith({ forceRefresh: false });
+    expect(auth.fetchAuthenticatedUser).toBeCalledWith({ forceRefresh: false });
   });
 });

@@ -11,4 +11,4 @@ export { default as saga } from './data/sagas';
 export { storeName } from './data/selectors';
 export { default as FormGroup } from './FormGroup';
 export { default as PasswordField } from './PasswordField';
-export { default as Zendesk } from './Zendesk';
+export { default as Logistration } from './Logistration';

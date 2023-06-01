@@ -1,6 +1,8 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 
+import CookiePolicyBanner from '@edx/frontend-component-cookie-policy-banner';
+import * as auth from '@edx/frontend-platform/auth';
 import { configure, injectIntl, IntlProvider } from '@edx/frontend-platform/i18n';
 import { mount } from 'enzyme';
 import { createMemoryHistory } from 'history';
@@ -9,10 +11,8 @@ import { MemoryRouter, Router } from 'react-router-dom';
 import configureStore from 'redux-mock-store';
 
 import { LOGIN_PAGE } from '../../data/constants';
-import { resetPassword, validateToken } from '../data/actions';
-import {
-  PASSWORD_RESET, PASSWORD_RESET_ERROR, SUCCESS, TOKEN_STATE,
-} from '../data/constants';
+import { resetPassword } from '../data/actions';
+import { PASSWORD_RESET, TOKEN_STATE } from '../data/constants';
 import ResetPasswordPage from '../ResetPasswordPage';
 
 jest.mock('@edx/frontend-platform/auth');
@@ -69,13 +69,11 @@ describe('ResetPasswordPage', () => {
       },
     });
 
-    jest.mock('@edx/frontend-platform/auth', () => ({
-      getHttpClient: jest.fn(() => ({
-        post: async () => ({
-          data: {},
-          catch: () => {},
-        }),
-      })),
+    auth.getHttpClient = jest.fn(() => ({
+      post: async () => ({
+        data: {},
+        catch: () => {},
+      }),
     }));
 
     store.dispatch = jest.fn(store.dispatch);
@@ -87,9 +85,9 @@ describe('ResetPasswordPage', () => {
       await resetPasswordPage.find('button.btn-brand').simulate('click');
     });
 
-    expect(store.dispatch).toHaveBeenCalledWith(
-      resetPassword({ new_password1: password, new_password2: password }, props.token, {}),
-    );
+    expect(store.dispatch).toHaveBeenCalledWith(resetPassword(
+      { new_password1: password, new_password2: password }, props.token, {},
+    ));
     resetPasswordPage.unmount();
   });
 
@@ -122,10 +120,9 @@ describe('ResetPasswordPage', () => {
       },
     });
     const resetPasswordPage = mount(reduxWrapper(<IntlResetPasswordPage {...props} />));
-    resetPasswordPage
-      .find('input#confirmPassword')
-      .simulate('change', { target: { value: 'password-mismatch', name: 'confirmPassword' } });
-
+    resetPasswordPage.find('input#confirmPassword').simulate(
+      'change', { target: { value: 'password-mismatch', name: 'confirmPassword' } },
+    );
     expect(resetPasswordPage.find('div[feedback-for="confirmPassword"]').text()).toContain('Passwords do not match');
   });
 
@@ -159,62 +156,9 @@ describe('ResetPasswordPage', () => {
 
   // ******** miscellaneous tests ********
 
-  it('should call validation on password field when blur event fires', () => {
+  it('check cookie rendered', () => {
     const resetPasswordPage = mount(reduxWrapper(<IntlResetPasswordPage {...props} />));
-    const expectedText = 'Password criteria has not been metPassword must contain at least 8 characters, at least one letter, and at least one number';
-    resetPasswordPage.find('input#newPassword').simulate('change', { target: { value: 'aziz156', name: 'newPassword' } });
-    resetPasswordPage.find('input#newPassword').simulate('blur', { target: { value: 'aziz156', name: 'newPassword' } });
-    expect(resetPasswordPage.find('div[feedback-for="newPassword"]').text()).toEqual(expectedText);
-  });
-  it('should not call validation when typing and click on show icon button', () => {
-    const resetPasswordPage = mount(reduxWrapper(<IntlResetPasswordPage {...props} />));
-    resetPasswordPage.find('input#newPassword').simulate('change', { target: { value: 'aziz156@', name: 'newPassword' } });
-    resetPasswordPage.find('button[aria-label="Show password"]').at(0).simulate('click');
-    resetPasswordPage.find('button[aria-label="Hide password"]').at(0).simulate('blur');
-    expect(resetPasswordPage.find('div[feedback-for="newPassword"]').exists()).toBe(false);
-  });
-  it('should call validation click on show icon button and then focus out', () => {
-    const resetPasswordPage = mount(reduxWrapper(<IntlResetPasswordPage {...props} />));
-    resetPasswordPage.find('input#newPassword').simulate('focus', { target: { value: 'aziz156@', name: 'newPassword' } });
-    resetPasswordPage.find('input#newPassword').simulate('blur', { relatedTarget: { name: 'password' } });
-    resetPasswordPage.find('button[aria-label="Show password"]').at(0).simulate('click');
-    expect(resetPasswordPage.find('div[feedback-for="newPassword"]').exists()).toBe(false);
-  });
-  it('show spinner when api call is pending', () => {
-    store.dispatch = jest.fn(store.dispatch);
-    props = {
-      status:
-      TOKEN_STATE.PENDING,
-      match: {
-        params: { token: '1c-bmjdkc-5e60e084cf8113048ca7' },
-      },
-    };
-    mount(reduxWrapper(<IntlResetPasswordPage {...props} />));
-    expect(store.dispatch).toHaveBeenCalledWith(validateToken(props.match.params.token));
-  });
-  it('should redirect the user to Reset password email screen ', async () => {
-    props = {
-      status:
-      PASSWORD_RESET_ERROR,
-    };
-    mount(reduxWrapper(
-      <Router history={history}>
-        <IntlResetPasswordPage {...props} />
-      </Router>,
-
-    ));
-    expect(history.location.pathname).toEqual('/reset');
-  });
-  it('should redirect the user to root url of the application ', async () => {
-    props = {
-      status: SUCCESS,
-    };
-    mount(reduxWrapper(
-      <Router history={history}>
-        <IntlResetPasswordPage {...props} />
-      </Router>,
-    ));
-    expect(history.location.pathname).toEqual('/login');
+    expect(resetPasswordPage.find(<CookiePolicyBanner />)).toBeTruthy();
   });
 
   it('show spinner during token validation', () => {

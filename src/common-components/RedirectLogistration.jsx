@@ -4,19 +4,12 @@ import { getConfig } from '@edx/frontend-platform';
 import PropTypes from 'prop-types';
 import { Redirect } from 'react-router-dom';
 
-import { AUTHN_PROGRESSIVE_PROFILING, RECOMMENDATIONS } from '../data/constants';
+import { WELCOME_PAGE } from '../data/constants';
 import { setCookie } from '../data/utils';
 
-const RedirectLogistration = (props) => {
+function RedirectLogistration(props) {
   const {
-    finishAuthUrl,
-    redirectUrl,
-    redirectToProgressiveProfilingPage,
-    success,
-    optionalFields,
-    redirectToRecommendationsPage,
-    educationLevel,
-    userId,
+    finishAuthUrl, redirectUrl, redirectToWelcomePage, success, optionalFields,
   } = props;
   let finalRedirectUrl = '';
 
@@ -31,14 +24,14 @@ const RedirectLogistration = (props) => {
       finalRedirectUrl = redirectUrl;
     }
 
-    // Redirect to Progressive Profiling after successful registration
-    if (redirectToProgressiveProfilingPage) {
-      // TODO: Do we still need this cookie?
+    if (redirectToWelcomePage) {
       setCookie('van-504-returning-user', true);
+      // use this component to redirect WelcomePage after successful registration
+      // return <Redirect to={WELCOME_PAGE} />;
       const registrationResult = { redirectUrl: finalRedirectUrl, success };
       return (
         <Redirect to={{
-          pathname: AUTHN_PROGRESSIVE_PROFILING,
+          pathname: WELCOME_PAGE,
           state: {
             registrationResult,
             optionalFields,
@@ -48,48 +41,25 @@ const RedirectLogistration = (props) => {
       );
     }
 
-    // Redirect to Recommendation page
-    if (redirectToRecommendationsPage) {
-      const registrationResult = { redirectUrl: finalRedirectUrl, success };
-      return (
-        <Redirect to={{
-          pathname: RECOMMENDATIONS,
-          state: {
-            registrationResult,
-            educationLevel,
-            userId,
-          },
-        }}
-        />
-      );
-    }
-
     window.location.href = finalRedirectUrl;
   }
-
-  return null;
-};
+  return <></>;
+}
 
 RedirectLogistration.defaultProps = {
-  educationLevel: null,
   finishAuthUrl: null,
   success: false,
   redirectUrl: '',
-  redirectToProgressiveProfilingPage: false,
+  redirectToWelcomePage: false,
   optionalFields: {},
-  redirectToRecommendationsPage: false,
-  userId: null,
 };
 
 RedirectLogistration.propTypes = {
-  educationLevel: PropTypes.string,
   finishAuthUrl: PropTypes.string,
   success: PropTypes.bool,
   redirectUrl: PropTypes.string,
-  redirectToProgressiveProfilingPage: PropTypes.bool,
+  redirectToWelcomePage: PropTypes.bool,
   optionalFields: PropTypes.shape({}),
-  redirectToRecommendationsPage: PropTypes.bool,
-  userId: PropTypes.number,
 };
 
 export default RedirectLogistration;

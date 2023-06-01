@@ -1,11 +1,5 @@
 // Load component based styles
 @import "_base_component.scss";
-@import "_registration.scss";
-@import "_recommendations_page.scss";
-@import "_reset_password.scss";
-@import "_progressive_profiling_page.scss";
-@import "_login_page.scss";
-@import "_forgot_password.scss";
 //
 // ----------------------------
 // #COLORS
@@ -25,12 +19,22 @@ $apple-focus-black: $apple-black;
 
 $elevation-level-2-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.15);
 
+body, html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.layout{
+  height: 100%;
+}
+
 // Forgot Password Page
 .forgot-password-button-width {
   min-width: 6rem;
 }
 
-.spinner--position-centered {
+.centered-align-spinner {
   left: 0;
   right: 0;
   bottom: 0;
@@ -50,6 +54,14 @@ $elevation-level-2-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.15);
 
 .stateful-button-width {
   width: 12rem;
+}
+
+.register-stateful-button-width {
+  min-width: 14.4rem;
+}
+
+.login-button-width {
+  min-width: 6rem;
 }
 
 .tpa-skeleton {
@@ -88,11 +100,18 @@ $elevation-level-2-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.15);
 }
 
 .form-control {
-  background-color: $white !important;
+  background-color: #F7F7FC !important;
   font-size: 0.875rem;
   line-height: 1.5;
   height: 2.75rem;
+border: 0px !important;
+border-radius: 0px !important; 
+font-size: 12px !important;
+}
 
+.form-control:focus{
+box-shadow: 0 0 0 0 !important;
+border: 0px !important;
 }
 
 .btn-social {
@@ -109,11 +128,23 @@ $elevation-level-2-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.15);
   height: 36px;
   color: $font-blue;
 
-  .btn-tpa__image-icon{
+  .icon-image {
     background-color: transparent;
     max-height: 24px;
     max-width: 24px;
   }
+}
+
+.btn {
+  font-style: normal !important;
+font-weight: 700 !important;
+font-size: 12px !important;
+}
+
+.btn-brand {
+    background-color: #12367E;
+    border-color: #12367E;
+    color: #fff;
 }
 
 .btn-tpa {
@@ -124,14 +155,14 @@ $elevation-level-2-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.15);
   padding-left: 1rem;
   width: 14rem;
 
-  .btn-tpa__image-icon {
+  .icon-image {
     background-color: transparent;
     max-height: 24px;
     max-width: 24px;
   }
 }
 
-.btn-tpa__font-container {
+.font-container {
   background-color: $font-blue;
   color: $white;
   font-size: 11px;
@@ -160,7 +191,7 @@ $elevation-level-2-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.15);
   border-color: $google-blue;
   background-color: $google-blue;
 
-  .ibtn-tpa__image-icon {
+  .icon-image {
     margin-left: -6px;
     max-height: 34px;
     max-width: 34px;
@@ -181,7 +212,7 @@ $elevation-level-2-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.15);
   background-color: $apple-black;
   font-size: 16px;
 
-  .ibtn-tpa__image-icon {
+  .icon-image {
     max-height: 1.8em;
     max-width: 2.0em;
   }
@@ -323,12 +354,33 @@ select.form-control {
   }
 
 }
+#forgotpassword-success-alert {
+  .alert-link {
+    color: $gray-700 !important;
+  }
+}
+
+.username-suggestion {
+  padding: 1px 0.5rem;
+  margin: 0.25rem;
+  border-radius: 0.375rem;
+  line-height: 24px;
+  font-size: 12px;
+  font-weight: normal;
+  color: $primary-700;
+}
+
+.username-suggestion-label {
+  font-size: 0.75rem;
+  line-height: 1.25rem;
+  margin-right: 0.25rem;
+}
 
 .yellow-border {
   border: 2px solid $accent-b;
 }
 
-.institutions__heading {
+.institute-heading {
   color: $primary-700;
 }
 
@@ -341,6 +393,58 @@ select.form-control {
   text-decoration: none;
 }
 
+.dropdown-item:active {
+    background-color: $light-300;
+}
+
+.dropdown-container {
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.15), 0px 2px 8px rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    max-height: 200px;
+    font-size: 1rem;
+    font-weight: normal;
+    line-height: 1.25rem;
+    overflow-y: scroll;
+    position: absolute;
+    background-color: $white;
+    width: 464px;
+    z-index: 100 !important;
+}
+
+.email-error-alert {
+  padding: 0.5rem 1rem;
+
+  .alert-close {
+    float: right;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  .alert-text {
+    font-size: 0.75rem;
+    line-height: 1.25rem;
+  }
+
+  .alert-link {
+    color: $primary !important;
+
+    &:hover {
+      text-decoration: underline;
+      color: $info-700 !important;
+    }
+  }
+}
+
+.email-warning-alert-link {
+  color: $info-500 !important;
+
+  &:hover {
+    text-decoration: underline;
+    color: $info-700 !important;
+  }
+}
 
 #forgot-password {
   &:hover {
@@ -364,12 +468,12 @@ select.form-control {
   font-size: 0.75rem;
 }
 
-.form-group__form-field .form-control:focus ~ .pgn__form-control-floating-label .pgn__form-control-floating-label-content {
+.form-field .form-control:focus ~ .pgn__form-control-floating-label .pgn__form-control-floating-label-content {
     font-size: 16px;
     color: $primary-700;
 }
 
-.form-group__form-field .form-control:not([value='']):not(:focus) ~
+.form-field .form-control:not([value='']):not(:focus) ~
   .pgn__form-control-floating-label .pgn__form-control-floating-label-content {
   font-size: 16px;
 }
@@ -381,6 +485,23 @@ select.form-control {
 .form-text-size {
   margin-top: 0.188rem !important;
   line-height: 1.25rem;
+}
+
+.progressive-profiling-support {
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+.pp-page-heading {
+  line-height: 1.75rem;
+  font-size: 1.375rem;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+
+  @include media-breakpoint-down('md') {
+    line-height: 1.5rem;
+    font-size: 1.125rem;
+  }
 }
 
 @media (min-width: 1024px) {
@@ -413,6 +534,14 @@ select.form-control {
   }
 }
 
+@media (max-width: 464px) {
+  .dropdown-container {
+    width: auto;
+    left: 0;
+    right: 0;
+    position: relative;
+  }
+}
 
 .alert {
   p:last-child {
@@ -441,19 +570,63 @@ select.form-control {
       min-width: unset !important;
     }
   }
+
+  .progressive-profiling-support {
+    font-size: 0.688rem;
+    font-weight: normal;
+    line-height: 0.938rem;
+  }
 }
 
 .table-striped tbody tr:nth-of-type(odd) {
   background-color: $light-200;
 }
 
-.institutions--provider-link {
+.secondary-provider-link {
   font-weight: normal;
   font-size: 0.875rem;
   line-height: 1.5rem;
   color: $primary-700
 }
 
+.opt-checkbox {
+  .pgn__form-label {
+    font-size: 0.75rem;
+    line-height: 1.25rem;
+  }
+  margin-left: 3px;
+}
+.suggested-username {
+  position: relative;
+  margin-top: -8.7%;
+  margin-left: 15px;
+}
+.suggested-username-close-button {
+  right: 1rem;
+  position: absolute;
+}
+.suggested-username-with-error {
+  position: relative;
+  margin-top: -13.7%;
+  margin-bottom: 11%;
+  margin-left: 15px;
+}
+.scroll-suggested-username {
+  width: 21rem;
+  white-space: nowrap;
+  overflow-x: auto;
+  display: inline-flex;
+}
+
 .pgn__form-control-decorator-trailing {
   right: 0 !important;
+}
+
+.nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link{
+  color: #12367E !important  ;
+  border-color : transparent transparent #0A3055 !important;
+}
+
+.login-banner {
+  width: 100%;
 }

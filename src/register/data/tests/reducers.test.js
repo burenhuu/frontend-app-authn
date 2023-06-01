@@ -1,240 +1,254 @@
-import { getConfig } from '@edx/frontend-platform';
-
-import { DEFAULT_REDIRECT_URL, DEFAULT_STATE, PENDING_STATE } from '../../../data/constants';
+import { DEFAULT_STATE } from '../../../data/constants';
 import {
-  BACKUP_REGISTRATION_DATA,
   REGISTER_CLEAR_USERNAME_SUGGESTIONS,
   REGISTER_FORM_VALIDATIONS,
   REGISTER_NEW_USER,
+  REGISTER_PERSIST_FORM_DATA,
   REGISTER_SET_COUNTRY_CODE,
-  REGISTER_SET_USER_PIPELINE_DATA_LOADED,
-  REGISTERATION_CLEAR_BACKEND_ERROR,
+  REGISTRATION_FORM,
 } from '../actions';
 import reducer from '../reducers';
 
-describe('Registration Reducer Tests', () => {
-  const defaultState = {
-    backendCountryCode: '',
-    registrationError: {},
-    registrationResult: {},
-    registrationFormData: {
-      configurableFormFields: {
-        marketingEmailsOptIn: true,
-      },
-      formFields: {
-        name: '', email: '', username: '', password: '',
-      },
-      emailSuggestion: {
-        suggestion: '', type: '',
-      },
-      errors: {
-        name: '', email: '', username: '', password: '',
-      },
-    },
-    validations: null,
-    submitState: DEFAULT_STATE,
-    userPipelineDataLoaded: false,
-    usernameSuggestions: [],
-    validationApiRateLimited: false,
-    shouldBackupState: false,
-  };
-
+describe('register reducer', () => {
   it('should return the initial state', () => {
-    expect(reducer(undefined, {})).toEqual(defaultState);
+    expect(reducer(undefined, {})).toEqual(
+      {
+        registrationError: {},
+        registrationResult: {},
+        registrationFormData: {
+          country: '',
+          email: '',
+          name: '',
+          password: '',
+          username: '',
+          marketingOptIn: true,
+          errors: {
+            email: '',
+            name: '',
+            username: '',
+            password: '',
+            country: '',
+          },
+          emailFieldBorderClass: '',
+          emailErrorSuggestion: null,
+          emailWarningSuggestion: null,
+        },
+        validations: null,
+        statusCode: null,
+        usernameSuggestions: [],
+        extendedProfile: [],
+        fieldDescriptions: {},
+        formRenderState: DEFAULT_STATE,
+      },
+    );
   });
 
-  it('should set username suggestions returned by the backend validations', () => {
-    const validations = {
-      usernameSuggestions: ['test12'],
-      validationDecisions: {
+  it('should set username suggestions upon validation failed case', () => {
+    const state = {
+      usernameSuggestions: [],
+      registrationFormData: {
+        country: '',
+        email: '',
         name: '',
+        password: '',
+        username: '',
+        marketingOptIn: true,
+        errors: {
+          email: '',
+          name: '',
+          username: '',
+          password: '',
+          country: '',
+        },
+        emailFieldBorderClass: '',
+        emailErrorSuggestion: null,
+        emailWarningSuggestion: null,
       },
     };
-    const { usernameSuggestions, ...validationWithoutUsernameSuggestions } = validations;
+    const validations = { usernameSuggestions: ['test12'], validationDecisions: {} };
     const action = {
       type: REGISTER_FORM_VALIDATIONS.SUCCESS,
       payload: { validations },
     };
 
-    expect(reducer(defaultState, action)).toEqual(
+    expect(
+      reducer(state, action),
+    ).toEqual(
       {
-        ...defaultState,
-        usernameSuggestions,
-        validations: validationWithoutUsernameSuggestions,
-      },
-    );
-  });
-  it('should set redirect url dashboard on registration success action', () => {
-    const payload = {
-      redirectUrl: `${getConfig().BASE_URL}${DEFAULT_REDIRECT_URL}`,
-      success: true,
-    };
-    const action = {
-      type: REGISTER_NEW_USER.SUCCESS,
-      payload,
-    };
-
-    expect(reducer(defaultState, action)).toEqual(
-      {
-        ...defaultState,
-        registrationResult: payload,
-      },
-    );
-  });
-
-  it('should set the registration call and set the registration error object empty', () => {
-    const action = {
-      type: REGISTER_NEW_USER.BEGIN,
-    };
-
-    expect(reducer({
-      ...defaultState,
-      registrationError: {
-        email: 'This email already exist.',
-      },
-    }, action)).toEqual(
-      {
-        ...defaultState,
-        submitState: PENDING_STATE,
-        registrationError: {},
+        validations,
+        registrationFormData: {
+          country: '',
+          email: '',
+          name: '',
+          password: '',
+          username: '',
+          marketingOptIn: true,
+          errors: {
+            email: '',
+            name: '',
+            username: '',
+            password: '',
+            country: '',
+          },
+          emailFieldBorderClass: '',
+          emailErrorSuggestion: null,
+          emailWarningSuggestion: null,
+        },
+        usernameSuggestions: validations.usernameSuggestions,
       },
     );
   });
 
-  it('should show username suggestions returned by registration error', () => {
+  it('should set username suggestions upon registration error case', () => {
+    const state = {
+      usernameSuggestions: [],
+    };
     const payload = { usernameSuggestions: ['test12'] };
     const action = {
       type: REGISTER_NEW_USER.FAILURE,
       payload,
     };
 
-    expect(reducer(defaultState, action)).toEqual(
+    expect(
+      reducer(state, action),
+    ).toEqual(
       {
-        ...defaultState,
         registrationError: payload,
+        submitState: DEFAULT_STATE,
         usernameSuggestions: payload.usernameSuggestions,
-      },
-    );
-  });
-  it('should set the register user when SSO pipline data is loaded', () => {
-    const payload = { value: true };
-    const action = {
-      type: REGISTER_SET_USER_PIPELINE_DATA_LOADED,
-      payload,
-    };
-
-    expect(reducer(defaultState, action)).toEqual(
-      {
-        ...defaultState,
-        userPipelineDataLoaded: true,
-      },
-    );
-  });
-
-  it('should set country code on blur', () => {
-    const action = {
-      type: REGISTER_SET_COUNTRY_CODE,
-      payload: { countryCode: 'PK' },
-    };
-
-    expect(reducer({
-      ...defaultState,
-      registrationFormData: {
-        ...defaultState.registrationFormData,
-        configurableFormFields: {
-          ...defaultState.registrationFormData.configurableFormFields,
-          country: {
-            name: 'Pakistan',
-            code: 'PK',
-          },
-        },
-      },
-    }, action)).toEqual(
-      {
-        ...defaultState,
-        registrationFormData: {
-          ...defaultState.registrationFormData,
-          configurableFormFields: {
-            ...defaultState.registrationFormData.configurableFormFields,
-            country: {
-              name: 'Pakistan',
-              code: 'PK',
-            },
-          },
-        },
-      },
-    );
-  });
-  it(' registration api failure when api rate limit hits', () => {
-    const action = {
-      type: REGISTER_FORM_VALIDATIONS.FAILURE,
-    };
-
-    expect(reducer(defaultState, action)).toEqual(
-      {
-        ...defaultState,
-        validationApiRateLimited: true,
         validations: null,
       },
     );
   });
-  it('should clear username suggestions', () => {
+
+  it('should clear username suggestions from validations state', () => {
     const state = {
-      ...defaultState,
       usernameSuggestions: ['test_1'],
     };
     const action = {
       type: REGISTER_CLEAR_USERNAME_SUGGESTIONS,
     };
 
-    expect(reducer(state, action)).toEqual({ ...defaultState });
+    expect(
+      reducer(state, action),
+    ).toEqual(
+      {
+        usernameSuggestions: [],
+      },
+    );
   });
-
-  it('should take back data during form reset', () => {
+  it('should not reset username suggestions and form data in form reset', () => {
     const state = {
-      ...defaultState,
-      shouldBackupState: true,
-    };
-    const action = {
-      type: BACKUP_REGISTRATION_DATA.BASE,
-    };
-
-    expect(reducer(state, action)).toEqual({
-      ...defaultState,
-      shouldBackupState: true,
-    });
-  });
-
-  it('should not reset username suggestions and fields data during form reset', () => {
-    const state = {
-      ...defaultState,
+      registrationError: {},
+      registrationResult: {},
+      registrationFormData: {
+        country: 'PK',
+        email: 'test@email.com',
+        name: 'John Doe',
+        password: 'johndoe',
+        username: 'john',
+        marketingOptIn: true,
+        errors: {
+          email: '',
+          name: '',
+          username: '',
+          password: '',
+          country: '',
+        },
+        emailErrorSuggestion: 'test@email.com',
+        emailWarningSuggestion: 'test@email.com',
+      },
+      validations: null,
+      statusCode: null,
+      extendedProfile: [],
+      fieldDescriptions: {},
+      formRenderState: DEFAULT_STATE,
       usernameSuggestions: ['test1', 'test2'],
     };
     const action = {
-      type: BACKUP_REGISTRATION_DATA.BEGIN,
-      payload: { ...state.registrationFormData },
+      type: REGISTRATION_FORM.RESET,
     };
 
-    expect(reducer(state, action)).toEqual(state);
+    expect(
+      reducer(state, action),
+    ).toEqual(
+      state,
+    );
   });
 
-  it('should reset email error field data on focus of email field', () => {
+  it('should set registrationFormData', () => {
     const state = {
-      ...defaultState,
-      registrationError: { email: `This email is already associated with an existing or previous ${ getConfig().SITE_NAME } account` },
+      registrationFormData: {
+        country: '',
+        email: '',
+        name: '',
+        password: '',
+        username: '',
+        marketingOptIn: true,
+        errors: {
+          email: '',
+          name: '',
+          username: '',
+          password: '',
+          country: '',
+        },
+        emailErrorSuggestion: null,
+        emailWarningSuggestion: null,
+      },
     };
-    const action = {
-      type: REGISTERATION_CLEAR_BACKEND_ERROR,
-      payload: 'email',
+    const formData = {
+      country: 'PK',
+      email: 'test@email.com',
+      name: 'John Doe',
+      password: 'johndoe',
+      username: 'john',
+      emailErrorSuggestion: 'test@email.com',
+      emailWarningSuggestion: 'test@email.com',
     };
 
-    expect(reducer(state, action)).toEqual({
-      ...state,
-      registrationError: {},
-    });
+    const action = {
+      type: REGISTER_PERSIST_FORM_DATA,
+      payload: { formData },
+    };
+
+    expect(
+      reducer(state, action),
+    ).toEqual(
+      {
+        registrationFormData: {
+          ...state.registrationFormData,
+          country: 'PK',
+          email: 'test@email.com',
+          name: 'John Doe',
+          password: 'johndoe',
+          username: 'john',
+          emailErrorSuggestion: 'test@email.com',
+          emailWarningSuggestion: 'test@email.com',
+        },
+      },
+    );
   });
 
-  it('should set country code', () => {
+  it('should set country code from context', () => {
+    const state = {
+      registrationFormData: {
+        country: '',
+        email: '',
+        name: '',
+        password: '',
+        username: '',
+        marketingOptIn: true,
+        errors: {
+          email: '',
+          name: '',
+          username: '',
+          password: '',
+          country: '',
+        },
+        emailErrorSuggestion: null,
+        emailWarningSuggestion: null,
+      },
+    };
     const countryCode = 'PK';
 
     const action = {
@@ -242,10 +256,14 @@ describe('Registration Reducer Tests', () => {
       payload: { countryCode },
     };
 
-    expect(reducer(defaultState, action)).toEqual(
+    expect(
+      reducer(state, action),
+    ).toEqual(
       {
-        ...defaultState,
-        backendCountryCode: countryCode,
+        registrationFormData: {
+          ...state.registrationFormData,
+          country: 'PK',
+        },
       },
     );
   });

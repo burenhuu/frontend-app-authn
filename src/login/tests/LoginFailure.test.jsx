@@ -1,5 +1,6 @@
 import React from 'react';
 
+import * as auth from '@edx/frontend-platform/auth';
 import { injectIntl, IntlProvider } from '@edx/frontend-platform/i18n';
 import { mount } from 'enzyme';
 import { MemoryRouter } from 'react-router-dom';
@@ -15,13 +16,11 @@ import {
   NON_COMPLIANT_PASSWORD_EXCEPTION,
   NUDGE_PASSWORD_CHANGE,
   REQUIRE_PASSWORD_CHANGE,
-  TPA_AUTHENTICATION_FAILURE,
 } from '../data/constants';
 import LoginFailureMessage from '../LoginFailure';
 
-jest.mock('@edx/frontend-platform/auth', () => ({
-  getAuthService: jest.fn(),
-}));
+jest.mock('@edx/frontend-platform/auth');
+auth.getAuthService = jest.fn();
 
 const IntlLoginFailureMessage = injectIntl(LoginFailureMessage);
 
@@ -65,7 +64,7 @@ describe('LoginFailureMessage', () => {
         errorCode: INACTIVE_USER,
         context: {
           platformName: 'openedX',
-          supportLink: 'http://support.openedx.test',
+          supportLink: 'https://support.edx.org/',
         },
       },
     };
@@ -81,7 +80,7 @@ describe('LoginFailureMessage', () => {
                             + 'check your spam folders or contact openedX support.';
 
     expect(loginFailureMessage.find('#login-failure-alert').first().text()).toEqual(expectedMessage);
-    expect(loginFailureMessage.find('#login-failure-alert').find('a').props().href).toEqual('http://support.openedx.test');
+    expect(loginFailureMessage.find('#login-failure-alert').find('a').props().href).toEqual('https://support.edx.org/');
   });
 
   it('test match failed login attempt error', () => {
@@ -220,28 +219,6 @@ describe('LoginFailureMessage', () => {
     expect(loginFailureMessage.find('#login-failure-alert').first().text()).toEqual(expectedMessage);
   });
 
-  it('should match tpa authentication failed error message', () => {
-    props = {
-      loginError: {
-        errorCode: TPA_AUTHENTICATION_FAILURE,
-        context: {
-          errorMessage: 'An error occured',
-        },
-      },
-    };
-
-    const loginFailureMessage = mount(
-      <IntlProvider locale="en">
-        <IntlLoginFailureMessage {...props} />
-      </IntlProvider>,
-    );
-
-    const expectedMessageSubstring = 'We are sorry, you are not authorized to access';
-
-    expect(loginFailureMessage.find('#login-failure-alert').first().text()).toContain(expectedMessageSubstring);
-    expect(loginFailureMessage.find('#login-failure-alert').first().text()).toContain('An error occured');
-  });
-
   it('should show modal that nudges users to change password', () => {
     props = {
       loginError: {
@@ -292,7 +269,7 @@ describe('LoginFailureMessage', () => {
         email: 'text@example.com',
         errorCode: ALLOWED_DOMAIN_LOGIN_ERROR,
         context: {
-          allowedDomain: 'test.com',
+          allowedDomain: 'edx.org',
           provider: 'Google',
           tpaHint: 'google-auth2',
         },
@@ -305,7 +282,7 @@ describe('LoginFailureMessage', () => {
       </IntlProvider>,
     );
 
-    const errorMessage = "We couldn't sign you in.As test.com user, You must login with your test.com Google account.";
+    const errorMessage = "We couldn't sign you in.As edx.org user, You must login with your edx.org Google account.";
     const url = 'http://localhost:18000/dashboard/?tpa_hint=google-auth2';
 
     expect(loginFailureMessage.find('#login-failure-alert').first().text()).toEqual(errorMessage);

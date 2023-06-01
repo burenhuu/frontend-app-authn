@@ -1,14 +1,17 @@
 import React from 'react';
 
-import { getConfig } from '@edx/frontend-platform';
+import { mergeConfig } from '@edx/frontend-platform';
 import { injectIntl, IntlProvider } from '@edx/frontend-platform/i18n';
 import { mount } from 'enzyme';
 
-import TermsOfService from '../registrationFields/TermsOfService';
+import TermsOfService from '../TermsOfService';
 
 const IntlTermsOfService = injectIntl(TermsOfService);
 
 describe('TermsOfServiceTest', () => {
+  mergeConfig({
+    TOS_LINK: 'http://tos-and-honor-code.com',
+  });
   let value = false;
 
   const changeHandler = (e) => {
@@ -20,7 +23,7 @@ describe('TermsOfServiceTest', () => {
   });
 
   it('should render error msg if Terms of Service checkbox is not checked', () => {
-    const errorMessage = `You must agree to the ${getConfig().SITE_NAME} Terms of Service`;
+    const errorMessage = 'You must agree to the edx Terms of Service';
     const termsOfService = mount(
       <IntlProvider locale="en">
         <IntlTermsOfService errorMessage={errorMessage} onChangeHandler={changeHandler} />
@@ -35,7 +38,7 @@ describe('TermsOfServiceTest', () => {
         <IntlTermsOfService onChangeHandler={changeHandler} />
       </IntlProvider>,
     );
-    const expectedMsg = 'I agree to the Your Platform Name Here\u00a0Terms of Servicein a new tab';
+    const expectedMsg = 'I agree to the Your Platform Name Here Terms of Servicein a new tab';
     expect(termsOfService.find('#terms-of-service').find('label').text()).toEqual(expectedMsg);
     expect(value).toEqual(false);
   });
