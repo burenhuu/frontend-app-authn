@@ -630,3 +630,12 @@ select.form-control {
 .login-banner {
   width: 100%;
 }
+
+.btn-brand.focus::before, .btn-brand:focus::before{
+  border: solid 2px #12367E !important;
+}
+
+.btn-brand:hover{
+  background-color: #12367E !important;
+    border-color: #12367E !important;
+}
